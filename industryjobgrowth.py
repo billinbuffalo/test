@@ -1,4 +1,7 @@
-import csv, sqlite3
+import csv
+import sqlite3
+import matplotlib.pyplot as plt
+import openpyxl
 
 con = sqlite3.connect(":memory:")
 cur = con.cursor()
@@ -6,13 +9,10 @@ cur.execute("CREATE TABLE projections (SOC, Change, Industry);") # use your colu
 cur.execute("CREATE TABLE codelookup (Code, Occupation);") # use your column names here
 
 OccupationCodesFile = open('/Users/bill/School/MSIT/Data/occupationcodes.csv')
-codelookup = csv.DictReader(OccupationCodesFile, delimiter=',')
+codelookup = csv.DictReader(OccupationCodesFile)
 
 ProjectionsFile = open('/Users/bill/School/MSIT/Data/Long_Term_Occupational_Projections.csv')
-projections = csv.DictReader(ProjectionsFile, delimiter=',')
-
-    # csv.DictReader uses first line in file for column headings by default
-    #dr = csv.DictReader(fin) # In DictReader the comma is default delimiter
+projections = csv.DictReader(ProjectionsFile)
 
 for row in codelookup:
     temp = [(i['Code'], i['Occupation']) for i in codelookup]
@@ -58,7 +58,7 @@ TenYearMinusTopFive = TenYearTotalGrowth - TopFiveTotalChange
 print('Remainder: ',TenYearMinusTopFive)
 
 
-import matplotlib.pyplot as plt
+
 
 # Data to plot
 labels = [IndustryAndTotalChange[0][0], IndustryAndTotalChange[1][0], IndustryAndTotalChange[2][0], IndustryAndTotalChange[3][0], IndustryAndTotalChange[4][0], 'All Others']
@@ -72,7 +72,7 @@ plt.title('Percentage of 10 Year Job Growth by Industry')
 plt.axis('equal')
 plt.show()
 
-import openpyxl
+
 wb = openpyxl.load_workbook('/Users/bill/School/MSIT/Data/jobprojectionsoutput.xlsx')
 
 sheet = wb.get_sheet_by_name('Sheet1')
