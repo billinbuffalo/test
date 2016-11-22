@@ -19,6 +19,10 @@ for row in codelookup:
     cur.executemany("INSERT INTO codelookup (Code, Occupation) VALUES (?, ?);", temp)
     con.commit()
 
+cur.executescript("UPDATE codelookup SET Occupation = SUBSTR(Occupation, 1,LENGTH(Occupation)-12)")
+con.commit
+
+
 for row in projections:
     temp2 = [(i['SOC'], i['Change']) for i in projections]
     cur.executemany("INSERT INTO projections (SOC, Change) VALUES (?, ?);", temp2)
@@ -53,18 +57,36 @@ print('Top Five Industries Total Job Growth: ',TopFiveTotalChange)
 TenYearMinusTopFive = TenYearTotalGrowth - TopFiveTotalChange
 print('Remainder: ',TenYearMinusTopFive)
 
+
 import matplotlib.pyplot as plt
 
+# Data to plot
 labels = [IndustryAndTotalChange[0][0], IndustryAndTotalChange[1][0], IndustryAndTotalChange[2][0], IndustryAndTotalChange[3][0], IndustryAndTotalChange[4][0], 'All Others']
 sizes = [IndustryAndTotalChange[0][1], IndustryAndTotalChange[1][1], IndustryAndTotalChange[2][1], IndustryAndTotalChange[3][1], IndustryAndTotalChange[4][1], TenYearMinusTopFive]
-patches, texts = plt.pie(sizes, shadow=True, radius=.5)
-plt.legend(patches, labels, loc="best")
+explode = (0, 0.1, 0, 0, 0.1, 0)  # explode 1st slice
+
+# Plot
+plt.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=140)
+
+plt.title('Percentage of 10 Year Job Growth by Industry')
 plt.axis('equal')
-plt.title('10 Year Job Growth By Industry in NYS')
-#plt.tight_layout()
 plt.show()
 
+import openpyxl
+wb = openpyxl.load_workbook('/Users/bill/School/MSIT/Data/jobprojectionsoutput.xlsx')
 
+sheet = wb.get_sheet_by_name('Sheet1')
+wb.remove_sheet(sheet)
+wb.create_sheet('Sheet1')
+sheet = wb.get_sheet_by_name('Sheet1')
+
+sheet.cell(row=1, column=1).value = 'Occupation'
+sheet.cell(row=1, column=2).value = '10 Year Projected Job Growth in NYS'
+
+for row in IndustryAndTotalChange:
+    sheet.append(row)
+
+wb.save('/Users/bill/School/MSIT/Data/jobprojectionsoutput.xlsx')
 
 con.close()
 ProjectionsFile.close()
