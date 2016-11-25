@@ -29,7 +29,7 @@ with open('/Users/bill/School/MSIT/Data/ProjectionsCounts.csv') as MyFile:
     cur.executemany("INSERT INTO popproj (agegrpcode, agegrp, yr_2015, yr_2025) VALUES (?, ?, ?, ?);", to_db)
     con.commit()
 
-# Data Cleanup
+# START Data Cleanup ---------
 
 # Remove the word "Occupation" from the Industry descriptions to keep things neat
 cur.executescript("UPDATE codelookup SET Occupation = SUBSTR(Occupation, 1,LENGTH(Occupation)-12)")
@@ -44,6 +44,8 @@ for row in cur.execute('Select SOC from projections'):
 cur.executescript("DELETE from projections WHERE Industry = '00'")
 con.commit
 
+# END Data Cleanup ---------
+
 # Python Tuple to store results of the following SQL statement
 IndustryAndTotalChange = []
 
@@ -53,7 +55,7 @@ for row in cur.execute('SELECT codelookup.Occupation as Code, SUM(projections.Ch
                       'ORDER BY SUM(projections.Change) DESC'):
     IndustryAndTotalChange.append(row)
 
-# Get the total job growth
+# Get the total job growth for use in simple analysis
 for row in cur.execute('SELECT SUM(Change) FROM projections'):
     TenYearTotalGrowth = int(row[0])
 
@@ -77,8 +79,6 @@ plt.title('Percentage of 10 Year Job Growth by Industry')
 plt.axis('equal')
 plt.show()
 
-
-
 wb = openpyxl.load_workbook('/Users/bill/School/MSIT/Data/jobprojectionsoutput.xlsx')
 
 sheet1 = wb.get_sheet_by_name('Sheet1')
@@ -100,7 +100,7 @@ sheet2 = wb.get_sheet_by_name('Sheet2')
 sheet2.cell(row=1, column=1).value = 'Age Group'
 sheet2.cell(row=1, column=2).value = '2015'
 sheet2.cell(row=1, column=3).value = '2025 Projected'
-sheet2.cell(row=1, column=4).value = 'Change in Population'
+sheet2.cell(row=1, column=4).value = '10 Year Change in Population'
 
 for row in cur.execute('SELECT agegrp, SUM(yr_2015), SUM(yr_2025), SUM(yr_2025) - SUM(yr_2015) as total FROM popproj GROUP BY agegrpcode ORDER BY agegrpcode'):
     sheet2.append(row)
