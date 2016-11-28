@@ -46,7 +46,7 @@ con.commit
 
 # END Data Cleanup ---------
 
-# Python Tuple to store results of the following SQL statement
+# Python Tuple to store results of the next SQL statement
 IndustryAndTotalChange = []
 
 # Group occupations and total their change in jobs
@@ -59,7 +59,8 @@ for row in cur.execute('SELECT codelookup.Occupation as Code, SUM(projections.Ch
 for row in cur.execute('SELECT SUM(Change) FROM projections'):
     TenYearTotalGrowth = int(row[0])
 
-
+# Perform some simple analysis in Python
+# Total Job Growth, Top Five Occupations Job Growth, All other Occupations Job Growth
 print("Ten Year Projected Job Growth")
 print('Total Job Growth: ',TenYearTotalGrowth)
 TopFiveTotalChange = IndustryAndTotalChange[0][1] + IndustryAndTotalChange[1][1] + IndustryAndTotalChange[2][1] + IndustryAndTotalChange[3][1] + IndustryAndTotalChange[4][1]
@@ -67,17 +68,22 @@ print('Top Five Industries Total Job Growth: ',TopFiveTotalChange)
 TenYearMinusTopFive = TenYearTotalGrowth - TopFiveTotalChange
 print('Remainder: ',TenYearMinusTopFive)
 
-# Data to plot
+# Set up data for a Pie chart showing the fastest growing Occupations in NYS
 labels = [IndustryAndTotalChange[0][0], IndustryAndTotalChange[1][0], IndustryAndTotalChange[2][0], IndustryAndTotalChange[3][0], IndustryAndTotalChange[4][0], 'All Others']
 sizes = [IndustryAndTotalChange[0][1], IndustryAndTotalChange[1][1], IndustryAndTotalChange[2][1], IndustryAndTotalChange[3][1], IndustryAndTotalChange[4][1], TenYearMinusTopFive]
 explode = (0, 0.1, 0, 0, 0.1, 0)  # explode 1st slice
 
-# Plot
+# Plot the pie chart
 plt.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=140)
 
 plt.title('Percentage of 10 Year Job Growth by Industry')
 plt.axis('equal')
 plt.show()
+
+# Create an Excel workbook with two sheets
+#
+# The first sheet will show major Occupation categories and their projected growth in NYS over the next 10 years
+# The second sheet will show projected Population changes in NYS over the next 10 years
 
 wb = openpyxl.load_workbook('/Users/bill/School/MSIT/Data/jobprojectionsoutput.xlsx')
 
