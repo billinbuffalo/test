@@ -11,19 +11,19 @@ cur.execute("CREATE TABLE codelookup (Code, Occupation);") # use your column nam
 cur.execute("CREATE TABLE popproj (agegrpcode INT, agegrp, yr_2015 INT, yr_2025 INT);") # use your column names here
 
 # Load data from CSV files into the in-memory database
-with open('//Users/bill/School/MSIT/Data/occupationcodes.csv') as OccupationCodesFile:
+with open('//Users/bill/School/MSIT/Data/finalproject/occupationcodes.csv') as OccupationCodesFile:
     codelookup = csv.DictReader(OccupationCodesFile)
     tempcodes = [(i['Code'], i['Occupation']) for i in codelookup]
     cur.executemany("INSERT INTO codelookup (Code, Occupation) VALUES (?, ?);", tempcodes)
     con.commit()
 
-with open('/Users/bill/School/MSIT/Data/Long_Term_Occupational_Projections.csv') as ProjectionsFile:
+with open('/Users/bill/School/MSIT/Data/finalproject/Long_Term_Occupational_Projections.csv') as ProjectionsFile:
     projections = csv.DictReader(ProjectionsFile)
     tempproj = [(i['SOC'], i['Change']) for i in projections]
     cur.executemany("INSERT INTO projections (SOC, Change) VALUES (?, ?);", tempproj)
     con.commit()
 
-with open('/Users/bill/School/MSIT/Data/ProjectionsCounts.csv') as MyFile:
+with open('/Users/bill/School/MSIT/Data/finalproject/ProjectionsCounts.csv') as MyFile:
     reader = csv.DictReader(MyFile)  # comma is default delimiter
     to_db = [(i['agegrpcode'], i['agegrp'], i['yr_2015'], i['yr_2025']) for i in reader]
     cur.executemany("INSERT INTO popproj (agegrpcode, agegrp, yr_2015, yr_2025) VALUES (?, ?, ?, ?);", to_db)
@@ -85,7 +85,7 @@ plt.show()
 # The first sheet will show major Occupation categories and their projected growth in NYS over the next 10 years
 # The second sheet will show projected Population changes in NYS over the next 10 years
 
-wb = openpyxl.load_workbook('/Users/bill/School/MSIT/Data/jobprojectionsoutput.xlsx')
+wb = openpyxl.load_workbook('/Users/bill/School/MSIT/Data/finalproject/jobprojectionsoutput.xlsx')
 
 sheet1 = wb.get_sheet_by_name('Sheet1')
 wb.remove_sheet(sheet1)
@@ -111,7 +111,7 @@ sheet2.cell(row=1, column=4).value = '10 Year Change in Population'
 for row in cur.execute('SELECT agegrp, SUM(yr_2015), SUM(yr_2025), SUM(yr_2025) - SUM(yr_2015) as total FROM popproj GROUP BY agegrpcode ORDER BY agegrpcode'):
     sheet2.append(row)
 
-wb.save('/Users/bill/School/MSIT/Data/jobprojectionsoutput.xlsx')
+wb.save('/Users/bill/School/MSIT/Data//finalproject/jobprojectionsoutput.xlsx')
 
 con.close()
 ProjectionsFile.close()
