@@ -44,6 +44,7 @@ for row in reader:
         pop2025.append(row[14])
 
 myFile.close()
+###print(help())  test printing the help system
 
 # Convert population values to Int
 pop2025 = list(map(int, pop2025))

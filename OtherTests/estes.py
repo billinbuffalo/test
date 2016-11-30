@@ -42,7 +42,7 @@ ax_myFit.set_ylabel('point units')
 ax_myFit.set_title('bugs vs. point')
 ax_myFit.legend()
 
-
+plt.show()
 
 
 # print(len(bugs))
